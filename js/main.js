@@ -2,7 +2,7 @@
 // Node object used in Trie data structure
 function Node() {
   this.isWord = false;
-  this.children = {};
+  this.children = new Map();
 }
 
 // Trie data structure
@@ -20,12 +20,12 @@ Trie.prototype.loadWord = function(word) {
 
     letter = word.charAt(i);
 
-    if (letter in node.children) {
-      node = node.children[letter];
+    if (node.children.has(letter)) {
+      node = node.children.get(letter);
       continue;
     }
-    node.children[letter] = new Node(node);
-    node = node.children[letter];
+    node.children.set(letter, new Node(node));
+    node = node.children.get(letter);
   }
   node.isWord = true;
 }
@@ -35,28 +35,37 @@ Trie.prototype.checkWord = function(word) {
   var node = this.root,
       letter = '';
 
+
   for(var i = 0, len = word.length; len > i; i++) {
     letter = word.charAt(i);
-    if(!(letter in node.children)) {
+    //------ERROR-------------------///
+    if(node.children.has(letter)){
+      node = node.children.get(letter);
+    }else{
       return false;
     }
-    node = node.children[letter];
   }
-
   return node.isWord;
 }
 
 
 // so I can debug trie at the command line
-var trie = null;
+var trie;
 
 $(document).ready(function(){
 
   //--------Setup Trie statement----------------///
+  // JSON words files
+  //word2, word3, word4, word5, word6, word7, word8, word9, word10, word11, word12
   trie = new Trie(),
-      JSON_words = [word2, word3, word4, word5, word6, word7,
-               word8, word9, word10, word11, word12],
-      correctWords = [];
+      JSON_words = [word2, word3,
+                    word4, word5,
+                    word6, word7,
+                    word8, word9,
+                    word10, word11,
+                    word12],
+      correctWords = {};
+
 
 
   //build Trie using dictionary of words
@@ -72,6 +81,8 @@ $(document).ready(function(){
   //do not refresh on submit
   $('#word-form').submit(function(e) {
     e.preventDefault();
+    //reset input on enter
+    $('.word-input').val('');
 
   });
 
