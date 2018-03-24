@@ -1,74 +1,59 @@
+
+// Node object used in Trie data structure
 function Node() {
   this.isWord = false;
   this.children = {};
 }
 
-
+// Trie data structure
 function Trie() {
   this.root = new Node();
 }
 
+// adds word to Structure by each char
 Trie.prototype.loadWord = function(word) {
-  // set cursor vairable to root
-  var curs = this.root,
+  // set nodeor vairable to root
+  var node = this.root,
       letter = '';
 
   for(var i = 0, len = word.length; len > i; i++){
 
     letter = word.charAt(i);
 
-    if (letter in curs.children) {
-      curs = curs.children[letter];
+    if (letter in node.children) {
+      node = node.children[letter];
       continue;
     }
-    curs.children[letter] = new Node();
-    curs = curs.children[letter];
+    node.children[letter] = new Node(node);
+    node = node.children[letter];
   }
-  curs.isWord = true;
+  node.isWord = true;
 }
 
+// check if word is in Trie
 Trie.prototype.checkWord = function(word) {
-  var curs = this.root
+  var node = this.root,
       letter = '';
 
   for(var i = 0, len = word.length; len > i; i++) {
     letter = word.charAt(i);
-    if(!(letter in curs.children)) {
+    if(!(letter in node.children)) {
       return false;
     }
-    curs = curs.children[letter];
+    node = node.children[letter];
   }
 
-  return curs.isWord ? true : false;
-}
-
-Trie.prototype.getWords = function(letters, node, word, ) {
-
-  //if there is no wat to find the parent looks like recursion is the only way :(
-  //while loop
-  var end = false,
-      node = this.root,
-      pos = 0,
-      word = '',
-      childNodes = Object.keys(node.children),
-      wordList = [];
-
-  while(!end) {
-    if(letters.indexOf(node.child[pos]) > -1) {
-      word += childNodes[pos];
-
-
-    }
-  }
+  return node.isWord;
 }
 
 
-
+// so I can debug trie at the command line
+var trie = null;
 
 $(document).ready(function(){
 
   //--------Setup Trie statement----------------///
-  var trie = new Trie(),
+  trie = new Trie(),
       JSON_words = [word2, word3, word4, word5, word6, word7,
                word8, word9, word10, word11, word12],
       correctWords = [];
@@ -87,18 +72,26 @@ $(document).ready(function(){
   //do not refresh on submit
   $('#word-form').submit(function(e) {
     e.preventDefault();
+
   });
 
 
   $('.word-input').on('input', function(){
     var word = $(this).val();
-    if(trie.checkWord(word) && correctWords.indexOf > -1) {
-      console.log(word + 'isword');
+    if(trie.checkWord(word)) {
+      console.log(word + ' is word!');
 
     }else{
       console.log('not a sword');
     }
   });
-  letters = ['a','g','r','c','b']
-  trie.getWords(letters);
+  letters = ['a','g','r','c','b'];
+  console.log(trie);
 });
+
+
+//TODO
+// - clear whitespace and lowercase word string
+// - add a list of guessed words so they cannot be duplicated
+//    -possible solutions object with boolean if guessed or not { 'word': true/false }
+// - create prototype function to get list of words given letters
