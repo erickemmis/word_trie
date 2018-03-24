@@ -1,13 +1,14 @@
 
 // Node object used in Trie data structure
-function Node() {
+function Node(parent) {
   this.isWord = false;
+  this.parent = parent;
   this.children = new Map();
 }
 
 // Trie data structure
 function Trie() {
-  this.root = new Node();
+  this.root = new Node(null);
 }
 
 // adds word to Structure by each char
