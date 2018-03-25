@@ -3,12 +3,28 @@
 function Node(parent) {
   this.isWord = false;
   this.parent = parent;
+  this.iterator = null;
   this.children = new Map();
+}
+
+Node.prototype.initIterator = function() {
+  this.iterator = this.children.keys();
+}
+
+Node.prototype.removeIterator = function() {
+  this.iterator = null;
+}
+
+Node.prototype.next = function() {
+  if(this.iterator){
+    return this.iterator.next().value;
+  }
 }
 
 // Trie data structure
 function Trie() {
-  this.root = new Node(null);
+  //use true so root has a parent
+  this.root = new Node(true);
 }
 
 // adds word to Structure by each char
@@ -39,7 +55,7 @@ Trie.prototype.checkWord = function(word) {
 
   for(var i = 0, len = word.length; len > i; i++) {
     letter = word.charAt(i);
-    //------ERROR-------------------///
+
     if(node.children.has(letter)){
       node = node.children.get(letter);
     }else{
@@ -49,6 +65,40 @@ Trie.prototype.checkWord = function(word) {
   return node.isWord;
 }
 
+Trie.prototype.calulateWordsGiven = function(letters) {
+  var words = [],
+      node = this.root,
+      current = null,
+      word = [];
+
+  //loop through trie to find possible words given letters
+  do {
+
+    if(!node.iterator){
+      node.initIterator();
+    }
+
+    current = node.next();
+
+    if(!current) {
+      node = node.parent;
+      word.pop();
+      continue;
+    }
+
+    if(letters.includes(current)){
+      node = node.children.get(current);
+      word.push(current);
+      if(node.isWord){
+        words.push(word.join(''));
+      }
+    }
+  }while(current || node.parent);
+
+  return words;
+
+}
+
 
 // so I can debug trie at the command line
 var trie;
@@ -56,17 +106,17 @@ var trie;
 $(document).ready(function(){
 
   //--------Setup Trie statement----------------///
-  // JSON words files
-  //word2, word3, word4, word5, word6, word7, word8, word9, word10, word11, word12
-  trie = new Trie(),
-      JSON_words = [word2, word3,
-                    word4, word5,
-                    word6, word7,
-                    word8, word9,
-                    word10, word11,
-                    word12],
-      correctWords = {};
 
+
+
+  trie = new Trie();
+  var JSON_words = [word2, word3, word4, word5,
+                  word6, word7, word8, word9,
+                  word10, word11, word12];
+      // JSON words files
+      // word2, word3, word4, word5,
+      // word6, word7, word8, word9,
+      // word10, word11, word12
 
 
   //build Trie using dictionary of words
@@ -97,8 +147,15 @@ $(document).ready(function(){
       console.log('not a sword');
     }
   });
-  letters = ['a','g','r','c','b'];
-  console.log(trie);
+  letters = ['b','u','c','r','l','e'];
+  //console.log(trie);
+  var a = trie.calulateWordsGiven(letters);
+
+  for(word in a) {
+    console.log(a[word]);
+  }
+  console.log(a.length);
+
 });
 
 
